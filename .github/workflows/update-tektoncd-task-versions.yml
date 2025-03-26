@@ -69,7 +69,7 @@ jobs:
 
             The versions are pulled from the latest available versions in the [tektoncd-catalog](https://github.com/openshift-pipelines/tektoncd-catalog) repository.
           branch: update-tekton-versions
-          base: main
+          base: testing2
           labels: automation
           delete-branch: true
 
