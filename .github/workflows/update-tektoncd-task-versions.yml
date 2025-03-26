@@ -13,10 +13,13 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Checkout Operator Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      # - name: Checkout Operator Repository
+      #   uses: actions/checkout@v4
+      #   with:
+      #     fetch-depth: 0
+      - name: checkout opertor repo
+        run: |
+          git clone --branch testing2 https://github.com/infernus01/operator.git
 
       - name: Clone TektonCD Catalog (p branch)
         run: |
