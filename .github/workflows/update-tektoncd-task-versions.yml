@@ -1,86 +1,14 @@
-# name: Update Tekton Task Versions
-
-# on:
-#   schedule:
-#     - cron: "0 0 * * 0"  # Runs weekly
-#   workflow_dispatch:  # Allows manual trigger
-
-# jobs:
-#   update-task-versions:
-#     runs-on: ubuntu-latest
-#     #if: github.repository_owner == 'tektoncd' # do not run this elsewhere
-#     permissions:
-#       contents: write
-#       pull-requests: write
-#     steps:
-#       - name: Checkout Operator Repository
-#         uses: actions/checkout@v4
-#         with:
-#           fetch-depth: 0
-
-#       - name: Clone TektonCD Catalog (p branch)
-#         run: |
-#           git clone --branch p https://github.com/infernus01/tektoncd-catalog.git ../tektoncd-catalog
-
-#       - name: Update Task Versions
-#         id: update
-#         run: |
-#           chmod +x hack/openshift/update-tekton-task-versions.sh
-#           ./hack/openshift/update-tekton-task-versions.sh \
-#             --catalog-path ../tektoncd-catalog \
-#             --script-path hack/openshift/fetch-tektoncd-catalog-tasks.sh
-#           echo "has_changes=$(git diff --name-only | grep -q fetch-tektoncd-catalog-tasks.sh && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
-
-      # - name: Set up Git config
-      #   if: steps.update.outputs.has_changes == 'true'
-      #   run: |
-      #     git config --global user.name "GitHub Actions Bot"
-      #     git config --global user.email "actions@github.com"
-#       # - name: Set up Git config
-#       #   if: steps.update.outputs.has_changes == 'true'
-#       #   run: |
-#       #     git config user.name "tekton-robot"
-#       #     git config user.email "dlorenc+tekton@google.com"
-
-#       - name: Commit Changes
-#         if: steps.update.outputs.has_changes == 'true'
-#         run: |
-#           git add hack/openshift/fetch-tektoncd-catalog-tasks.sh
-#           if ! git diff --cached --quiet; then
-#             git commit -m "Update Tekton task versions"
-#           else
-#             echo "No changes to commit. Skipping."
-#           fi
-
-#       - name: Create Pull Request
-#         if: steps.update.outputs.has_changes == 'true'
-#         uses: peter-evans/create-pull-request@v5
-#         with:
-#           token: ${{ secrets.GITHUB_TOKEN }}
-#           commit-message: "Update Tekton task versions"
-#           committer: Shubham Bhardwaj <shubbhar@redhat.com>
-#           author: Shubham Bhardwaj <shubbhar@redhat.com>
-#           title: "Update Tekton task versions"
-#           body: |
-#             This PR automatically updates the task versions in the `fetch-tektoncd-catalog-tasks.sh` script.
-
-#             The versions are pulled from the latest available versions in the [tektoncd-catalog](https://github.com/openshift-pipelines/tektoncd-catalog) repository.
-#           branch: update-tekton-versions
-#           base: main
-#           labels: automation
-#           delete-branch: true
-
-
 name: Update Tekton Task Versions
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # Runs daily
+    - cron: "0 0 * * 0"  # Runs weekly
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
   update-task-versions:
     runs-on: ubuntu-latest
+    #if: github.repository_owner == 'tektoncd' # do not run this elsewhere
     permissions:
       contents: write
       pull-requests: write
@@ -101,48 +29,31 @@ jobs:
           ./hack/openshift/update-tekton-task-versions.sh \
             --catalog-path ../tektoncd-catalog \
             --script-path hack/openshift/fetch-tektoncd-catalog-tasks.sh
+          echo "has_changes=$(git diff --name-only | grep -q fetch-tektoncd-catalog-tasks.sh && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
 
-          # Check if any changes were made and set the output variable
-          if git diff --name-only | grep -q fetch-tektoncd-catalog-tasks.sh; then
-            echo "has_changes=true" >> $GITHUB_ENV
-          else
-            echo "has_changes=false" >> $GITHUB_ENV
-          fi
-
-      - name: Skip if No Changes
-        if: env.has_changes == 'false'
-        run: |
-          echo "No changes detected. Exiting workflow."
-          exit 0
-
-      # - name: Set up Git config
-      #   run: |
-      #     git config user.name "tekton-robot"
-      #     git config user.email "dlorenc+tekton@google.com"
       - name: Set up Git config
         if: steps.update.outputs.has_changes == 'true'
         run: |
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
+      # - name: Set up Git config
+      #   if: steps.update.outputs.has_changes == 'true'
+      #   run: |
+      #     git config user.name "tekton-robot"
+      #     git config user.email "dlorenc+tekton@google.com"
 
       - name: Commit Changes
         if: steps.update.outputs.has_changes == 'true'
         run: |
           git add hack/openshift/fetch-tektoncd-catalog-tasks.sh
-          git commit -m "Update Tekton task versions"
-
-      # - name: Commit Changes
-      #   if: steps.update.outputs.has_changes == 'true'
-      #   run: |
-      #     if git diff --cached --quiet; then
-      #       echo "No changes to commit. Skipping."
-      #       exit 0
-      #     fi
-      #     git add hack/openshift/fetch-tektoncd-catalog-tasks.sh
-      #     git commit -m "Update Tekton task versions"
-
+          if ! git diff --cached --quiet; then
+            git commit -m "Update Tekton task versions"
+          else
+            echo "No changes to commit. Skipping."
+          fi
 
       - name: Create Pull Request
+        if: steps.update.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -158,3 +69,94 @@ jobs:
           base: main
           labels: automation
           delete-branch: true
+
+
+
+
+# name: Update Tekton Task Versions
+
+# on:
+#   schedule:
+#     - cron: "0 0 * * *"  # Runs daily
+#   workflow_dispatch:  # Allows manual trigger
+
+# jobs:
+#   update-task-versions:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write
+#       pull-requests: write
+#     steps:
+#       - name: Checkout Operator Repository
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+
+#       - name: Clone TektonCD Catalog (p branch)
+#         run: |
+#           git clone --branch p https://github.com/infernus01/tektoncd-catalog.git ../tektoncd-catalog
+
+#       - name: Update Task Versions
+#         id: update
+#         run: |
+#           chmod +x hack/openshift/update-tekton-task-versions.sh
+#           ./hack/openshift/update-tekton-task-versions.sh \
+#             --catalog-path ../tektoncd-catalog \
+#             --script-path hack/openshift/fetch-tektoncd-catalog-tasks.sh
+
+#           # Check if any changes were made and set the output variable
+#           if git diff --name-only | grep -q fetch-tektoncd-catalog-tasks.sh; then
+#             echo "has_changes=true" >> $GITHUB_ENV
+#           else
+#             echo "has_changes=false" >> $GITHUB_ENV
+#           fi
+
+#       - name: Skip if No Changes
+#         if: env.has_changes == 'false'
+#         run: |
+#           echo "No changes detected. Exiting workflow."
+#           exit 0
+
+#       # - name: Set up Git config
+#       #   run: |
+#       #     git config user.name "tekton-robot"
+#       #     git config user.email "dlorenc+tekton@google.com"
+#       - name: Set up Git config
+#         if: steps.update.outputs.has_changes == 'true'
+#         run: |
+#           git config --global user.name "GitHub Actions Bot"
+#           git config --global user.email "actions@github.com"
+
+#       - name: Commit Changes
+#         if: steps.update.outputs.has_changes == 'true'
+#         run: |
+#           git add hack/openshift/fetch-tektoncd-catalog-tasks.sh
+#           git commit -m "Update Tekton task versions"
+
+#       # - name: Commit Changes
+#       #   if: steps.update.outputs.has_changes == 'true'
+#       #   run: |
+#       #     if git diff --cached --quiet; then
+#       #       echo "No changes to commit. Skipping."
+#       #       exit 0
+#       #     fi
+#       #     git add hack/openshift/fetch-tektoncd-catalog-tasks.sh
+#       #     git commit -m "Update Tekton task versions"
+
+
+#       - name: Create Pull Request
+#         uses: peter-evans/create-pull-request@v5
+#         with:
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           commit-message: "Update Tekton task versions"
+#           committer: Shubham Bhardwaj <shubbhar@redhat.com>
+#           author: Shubham Bhardwaj <shubbhar@redhat.com>
+#           title: "Update Tekton task versions"
+#           body: |
+#             This PR automatically updates the task versions in the `fetch-tektoncd-catalog-tasks.sh` script.
+
+#             The versions are pulled from the latest available versions in the [tektoncd-catalog](https://github.com/openshift-pipelines/tektoncd-catalog) repository.
+#           branch: update-tekton-versions
+#           base: main
+#           labels: automation
+#           delete-branch: true
