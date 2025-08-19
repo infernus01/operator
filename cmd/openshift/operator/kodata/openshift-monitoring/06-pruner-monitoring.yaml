@@ -21,7 +21,7 @@ metadata:
   annotations:
     networkoperator.openshift.io/ignore-errors: ""
   name: openshift-pruner-monitor
-  namespace: openshift-pipelines
+  namespace: tekton-pipelines
 spec:
   endpoints:
     - interval: 10s
